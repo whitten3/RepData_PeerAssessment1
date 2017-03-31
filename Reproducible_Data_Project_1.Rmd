@@ -1,0 +1,140 @@
+---
+title: "Reproducible Data Project #1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Loading and Processing Data
+================================
+```{r, echo=TRUE}
+#load data 
+path<-"~/coursera/repdata_data_activity/activity.csv"
+activity<-read.csv(file=path,
+colClasses=c("integer", "Date", "integer"))
+#remove na
+steps<-na.omit(activity)
+```
+
+## What is the mean total of steps taken per day?
+
+```{r, echo=TRUE}
+
+#sum steps by date, calculate mean and median
+sum_steps<-aggregate(steps~date, steps, sum)
+mean_steps<-aggregate(steps~date, steps, mean)
+median_steps<-aggregate(steps~date, steps, median)
+
+#histogram of steps by date
+plot(sum_steps, type="h", main="Total Steps Taken Per
+Day", xlab="Date", ylab="Steps", lwd=2)
+```
+
+# Mean number of steps taken per day
+```{r, echo=TRUE}
+mean_steps
+
+```
+
+# Median number of steps taken per day
+```{r, echo=TRUE}
+median_steps
+```
+
+## What is the average daily activity pattern?
+===============================================
+```{r, echo=TRUE}
+
+#create avg steps by interval across all days
+mean_interval<-aggregate(steps~interval, 
+steps, mean)
+
+#plot line graph and return interval w/max steps
+plot(mean_interval, type="l", main=
+"Mean Steps Per 5-Sec Interval", 
+xlab="Interval", ylab="Steps")
+
+max_interval<-mean_interval$interval[mean_interval$steps==max(mean_interval$steps)]
+
+```
+# 5-second interval with the maximum number of steps
+```{r, echo=TRUE}
+max_interval
+```
+
+# Imputing missing values
+===========================
+# Total number of NA's in dataset
+```{r, echo=TRUE}
+
+#calculate total NA's in "activity"
+totalNA<-sum(is.na(activity$steps))
+totalNA
+```
+```{r,echo=TRUE}
+#replace missing values and recalculate sum, mean and ##median steps, plot new steps/day
+library(mice)
+newframe<-subset(activity, 
+subset=, select=c("steps", "interval"))
+imp<-mice(newframe, m=5, method="pmm", seed=500)
+newframe2<-complete(imp,1)
+Date<-activity$date
+new_activity<-cbind(newframe2, Date)
+sum_steps2<-aggregate(steps~Date,
+                      new_activity, sum)
+plot(sum_steps2, type="h", main="Total Steps/Day 
+After Imputation", xlab="Date", ylab="Steps", 
+lwd=2)
+mean_steps2<-aggregate(steps~Date, 
+new_activity, mean)
+median_steps2<-aggregate(steps~Date, 
+new_activity, median)
+```
+
+#Mean steps after data imputation
+```{r, echo=TRUE}
+mean_steps2
+```
+#Median steps after data imputation
+```{r, echo=TRUE}
+median_steps2
+```
+
+#Are there differences in patterns between weekdays and weekends?
+=======================================================
+```{r, echo=TRUE}
+#add new column to note weekday or weekend
+weekdays<-weekdays(new_activity$Date, 
+                   abbreviate=FALSE)
+
+weekdays<-ifelse(weekdays %in% 
+  c("Saturday","Sunday"), "Weekend", weekdays)
+weekdays<-ifelse(weekdays%in% c("Monday", 
+"Tuesday", "Wednesday", "Thursday", "Friday"), 
+"Weekday", weekdays)
+
+new_frame3<-cbind(new_activity, weekdays)
+
+#new data frames for weekdays and weekends and 
+
+MTWRF<-subset(new_frame3, subset=weekdays==
+"Weekday",select=c("steps", "interval", 
+                   "weekdays"))
+SS<-subset(new_frame3, subset=weekdays==
+"Weekend", select=c("steps", "interval", 
+                    "weekdays"))
+newSS<-aggregate(steps~interval, SS, mean)
+newMTWRF<-aggregate(steps~interval, MTWRF, mean)
+
+#plot mean steps by interval
+par(mfrow=2:1)
+plot(x=newMTWRF$interval, y=newMTWRF$steps, 
+     type="l", main="Avg Steps Per 5-Sec Interval",
+     sub="Weekdays", xlab="Interval", ylab="Steps")
+
+plot(x=newSS$interval, y=newSS$steps, type="l", 
+     sub="Weekend", xlab="Interval", ylab="Steps")
+```
+
