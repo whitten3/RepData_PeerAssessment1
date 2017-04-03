@@ -26,6 +26,10 @@ median_steps<-aggregate(steps~date, steps, median)
 
 The mean total of steps taken per day is:
 
+```r
+mean_steps
+```
+
 ```
 ##          date      steps
 ## 1  2012-10-02  0.4375000
@@ -84,6 +88,10 @@ The mean total of steps taken per day is:
 ```
 
 The median is:
+
+```r
+median_steps
+```
 
 ```
 ##          date steps
@@ -177,6 +185,10 @@ max_interval<-mean_interval$interval[mean_interval$steps==max(mean_interval$step
 The 5 minute interval with the maximum number of steps is:
 
 
+```r
+max_interval
+```
+
 ```
 ## [1] 835
 ```
@@ -191,6 +203,10 @@ totalNA<-sum(is.na(activity$steps))
 
 The total number of NA's in dataset is:
 
+
+```r
+totalNA
+```
 
 ```
 ## [1] 2304
@@ -259,6 +275,10 @@ lwd=2)
 
 The mean steps taken per day after imputing missing data is:
 
+```r
+mean_steps2
+```
+
 ```
 ##          Date      steps
 ## 1  2012-10-01 43.4583333
@@ -324,6 +344,10 @@ The mean steps taken per day after imputing missing data is:
 ## 61 2012-11-30 45.1250000
 ```
 The median steps taken per day after imputating missing data is:
+
+```r
+median_steps2
+```
 
 ```
 ##          Date steps
