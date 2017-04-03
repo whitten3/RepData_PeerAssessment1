@@ -1,14 +1,18 @@
 ---
-title: "Reproducible Data Project #1"
-output: html_document
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+keep_md=TRUE
+
 ```
 
-## Loading and Processing Data
-================================
+# Loading and Processing Data
+
 ```{r, echo=TRUE}
 #load data 
 path<-"~/coursera/repdata_data_activity/activity.csv"
@@ -18,7 +22,7 @@ colClasses=c("integer", "Date", "integer"))
 steps<-na.omit(activity)
 ```
 
-## What is the mean total of steps taken per day?
+# What is the mean total of steps taken per day?
 
 ```{r, echo=TRUE}
 
@@ -26,25 +30,30 @@ steps<-na.omit(activity)
 sum_steps<-aggregate(steps~date, steps, sum)
 mean_steps<-aggregate(steps~date, steps, mean)
 median_steps<-aggregate(steps~date, steps, median)
+```
 
-#histogram of steps by date
+The mean total of steps taken per day is:
+```{r}
+mean_steps
+```
+
+The median is:
+```{r}
+median_steps
+```
+
+
+Here is a histogram of the total steps taken per day
+
+```{r, echo=TRUE}
+
 plot(sum_steps, type="h", main="Total Steps Taken Per
 Day", xlab="Date", ylab="Steps", lwd=2)
 ```
 
-# Mean number of steps taken per day
-```{r, echo=TRUE}
-mean_steps
 
-```
-
-# Median number of steps taken per day
-```{r, echo=TRUE}
-median_steps
-```
-
-## What is the average daily activity pattern?
-===============================================
+# What is the average daily activity pattern?
+Here is a time series plot of the average number of steps taken per 5 minute interval averaged across all days:
 ```{r, echo=TRUE}
 
 #create avg steps by interval across all days
@@ -59,21 +68,29 @@ xlab="Interval", ylab="Steps")
 max_interval<-mean_interval$interval[mean_interval$steps==max(mean_interval$steps)]
 
 ```
-# 5-second interval with the maximum number of steps
-```{r, echo=TRUE}
+
+The 5 minute interval with the maximum number of steps is:
+
+```{r}
 max_interval
 ```
 
 # Imputing missing values
-===========================
-# Total number of NA's in dataset
+
 ```{r, echo=TRUE}
 
 #calculate total NA's in "activity"
 totalNA<-sum(is.na(activity$steps))
+
+```
+
+The total number of NA's in dataset is:
+
+```{r}
 totalNA
 ```
-```{r,echo=TRUE}
+
+```{r,echo=TRUE, cache=TRUE}
 #replace missing values and recalculate sum, mean and ##median steps, plot new steps/day
 library(mice)
 newframe<-subset(activity, 
@@ -84,26 +101,31 @@ Date<-activity$date
 new_activity<-cbind(newframe2, Date)
 sum_steps2<-aggregate(steps~Date,
                       new_activity, sum)
-plot(sum_steps2, type="h", main="Total Steps/Day 
-After Imputation", xlab="Date", ylab="Steps", 
-lwd=2)
 mean_steps2<-aggregate(steps~Date, 
 new_activity, mean)
 median_steps2<-aggregate(steps~Date, 
 new_activity, median)
 ```
 
-#Mean steps after data imputation
+Here is a histogram of of the total steps taken each day after imputation of missing data:
 ```{r, echo=TRUE}
+plot(sum_steps2, type="h", main="Total Steps/Day 
+After Imputation", xlab="Date", ylab="Steps", 
+lwd=2)
+
+```
+
+The mean steps taken per day after imputing missing data is:
+```{r}
 mean_steps2
 ```
-#Median steps after data imputation
-```{r, echo=TRUE}
+The median steps taken per day after imputating missing data is:
+```{r}
 median_steps2
 ```
 
 #Are there differences in patterns between weekdays and weekends?
-=======================================================
+
 ```{r, echo=TRUE}
 #add new column to note weekday or weekend
 weekdays<-weekdays(new_activity$Date, 
@@ -127,7 +149,10 @@ SS<-subset(new_frame3, subset=weekdays==
                     "weekdays"))
 newSS<-aggregate(steps~interval, SS, mean)
 newMTWRF<-aggregate(steps~interval, MTWRF, mean)
+```
 
+Here is a time series plot of the average numer of steps taken per 5 minute interval averaged across weekdays and weekends:
+```{r, echo=TRUE}
 #plot mean steps by interval
 par(mfrow=2:1)
 plot(x=newMTWRF$interval, y=newMTWRF$steps, 
@@ -138,3 +163,4 @@ plot(x=newSS$interval, y=newSS$steps, type="l",
      sub="Weekend", xlab="Interval", ylab="Steps")
 ```
 
+This individual seems to be more active, in general terms, on the weekend than on weekdays.  They maintain a higher average number of steps on the weekend compared to weekdays for almost every 5 second interval. 
